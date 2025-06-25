@@ -1,5 +1,5 @@
-# AsaApi.Plugins.Template
-Simple Template to make AsaAPI plugins
+# AsaApi.Plugins.DeathBagRetriever
+Corpse or Death bag / Cache bag retriever using a simple command
 
 # PLEASE ⭐STAR⭐ THE REPO IF YOU LIKE IT! THANKS!
 
