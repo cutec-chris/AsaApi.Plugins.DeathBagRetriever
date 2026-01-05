@@ -147,25 +147,24 @@ void FindPlayerCorpse(AShooterPlayerController* player_controller)
 			bool addToSlot = iItem->SlotIndexField() > -1;
 			iItem->AddToInventory(newInvComp, false, addToSlot, &iItem->ItemIDField(), true, true, false, false, false);
 
-			Log::GetLog()->info("item inv transferred: {}", iItem->DescriptiveNameBaseField().ToString());
+			FString BPPath = TEXT("INVALID_BP_PATH");
+			try {
+				BPPath = AsaApi::GetApiUtils().GetBlueprint(iItem);
+			} catch (...) {
+				BPPath = TEXT("EXCEPTION_GETTING_BP_PATH");
+			}
+
+			Log::GetLog()->info(
+				"item eq transferred: {} | BP: {}",
+				iItem->DescriptiveNameBaseField().ToString(),
+				TCHAR_TO_UTF8(*BPPath)
+			);
 		}
 
 		// Remove Corpse
 		DeathBagRetriever::playerCorpses.RemoveSingle(_pdd);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // --- DEGUB HERE --
 

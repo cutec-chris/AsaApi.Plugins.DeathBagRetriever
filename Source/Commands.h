@@ -1,69 +1,87 @@
-
-
 void AddOrRemoveCommands(bool addCmd = true)
 {
-	const FString CheckDebug = DeathBagRetriever::config["Commands"]["CheckCMD"].get<std::string>().c_str();
-	if (!CheckDebug.IsEmpty())
+	try
 	{
-		if (addCmd)
-		{
-			AsaApi::GetCommands().AddChatCommand(CheckDebug, &CheckCallback);
-		}
-		else
-		{
-			AsaApi::GetCommands().RemoveChatCommand(CheckDebug);
-		}
-	}
+		// Schütze gegen fehlende/NULL-Einträge in der Config und temporäre .c_str()-Pointer
+		const nlohmann::json cmds = DeathBagRetriever::config.value("Commands", nlohmann::json::object());
 
-	const FString KillMe = DeathBagRetriever::config["Commands"]["KillMeCMD"].get<std::string>().c_str();
-	if (!KillMe.IsEmpty())
-	{
-		if (addCmd)
 		{
-			AsaApi::GetCommands().AddChatCommand(KillMe, &KillMeCallBack);
+			std::string checkDebugStr = cmds.value("CheckCMD", "");
+			if (!checkDebugStr.empty())
+			{
+				FString CheckDebug = checkDebugStr.c_str();
+				try
+				{
+					if (addCmd)
+						AsaApi::GetCommands().AddChatCommand(CheckDebug, &CheckCallback);
+					else
+						AsaApi::GetCommands().RemoveChatCommand(CheckDebug);
+				}
+				catch (const std::exception& e)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: CheckCMD '{}' failed: {}", checkDebugStr, e.what());
+				}
+				catch (...)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: CheckCMD '{}' failed: unknown error", checkDebugStr);
+				}
+			}
 		}
-		else
-		{
-			AsaApi::GetCommands().RemoveChatCommand(KillMe);
-		}
-	}
 
-	const FString Teleport = DeathBagRetriever::config["Commands"]["TeleportCMD"].get<std::string>().c_str();
-	if (!Teleport.IsEmpty())
-	{
-		if (addCmd)
 		{
-			AsaApi::GetCommands().AddChatCommand(Teleport, &TeleportCallBack);
+			std::string killMeStr = cmds.value("KillMeCMD", "");
+			if (!killMeStr.empty())
+			{
+				FString KillMe = killMeStr.c_str();
+				try
+				{
+					if (addCmd)
+						AsaApi::GetCommands().AddChatCommand(KillMe, &KillMeCallBack);
+					else
+						AsaApi::GetCommands().RemoveChatCommand(KillMe);
+				}
+				catch (const std::exception& e)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: KillMeCMD '{}' failed: {}", killMeStr, e.what());
+				}
+				catch (...)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: KillMeCMD '{}' failed: unknown error", killMeStr);
+				}
+			}
 		}
-		else
-		{
-			AsaApi::GetCommands().RemoveChatCommand(Teleport);
-		}
-	}
 
-	/*const FString RepairItems = DeathBagRetriever::config["Commands"]["RepairItemCMD"].get<std::string>().c_str();
-	if (!RepairItems.IsEmpty())
-	{
-		if (addCmd)
 		{
-			AsaApi::GetCommands().AddChatCommand(RepairItems, &RepairItemsCallback);
+			std::string teleportStr = cmds.value("TeleportCMD", "");
+			if (!teleportStr.empty())
+			{
+				FString Teleport = teleportStr.c_str();
+				try
+				{
+					if (addCmd)
+						AsaApi::GetCommands().AddChatCommand(Teleport, &TeleportCallBack);
+					else
+						AsaApi::GetCommands().RemoveChatCommand(Teleport);
+				}
+				catch (const std::exception& e)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: TeleportCMD '{}' failed: {}", teleportStr, e.what());
+				}
+				catch (...)
+				{
+					Log::GetLog()->error("AddOrRemoveCommands: TeleportCMD '{}' failed: unknown error", teleportStr);
+				}
+			}
 		}
-		else
-		{
-			AsaApi::GetCommands().RemoveChatCommand(RepairItems);
-		}
-	}
 
-	const FString DeletePlayer = DeathBagRetriever::config["Commands"]["DeletePlayerCMD"].get<std::string>().c_str();
-	if (!DeletePlayer.IsEmpty())
+		// Auskommentierte/zusätzliche Commands belassen wie im Original, ggf. analog anpassen wenn aktiviert.
+	}
+	catch (const std::exception& e)
 	{
-		if (addCmd)
-		{
-			AsaApi::GetCommands().AddChatCommand(DeletePlayer, &DeletePlayerCallback);
-		}
-		else
-		{
-			AsaApi::GetCommands().RemoveChatCommand(DeletePlayer);
-		}
-	}*/
+		Log::GetLog()->error("AddOrRemoveCommands: std::exception: {}", e.what());
+	}
+	catch (...)
+	{
+		Log::GetLog()->error("AddOrRemoveCommands: unknown exception");
+	}
 }
